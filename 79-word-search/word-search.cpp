@@ -1,22 +1,31 @@
 class Solution {
-public:
-    bool dfs(vector<vector<char>>& board,int i,int j,string word,int count) {
-        if(count==word.size()) return true;
+private:
+    bool solve(int i,int j,vector<vector<char>> &board,string word,vector<vector<int>> &vis,int idx,int n,int m) {
+        if(idx==word.size()) return true;
 
-        if(i<0 || i>=board.size() || j<0 || j>=board[0].size() || word[count]!=board[i][j]) return false;
+        if(i<0 || j<0 || i>=n || j>=m || vis[i][j]==1 || word[idx]!=board[i][j]) return false;
 
-        char temp=board[i][j];
-        board[i][j]='*';
+        vis[i][j]=1;
 
-        bool isfound=dfs(board,i+1,j,word,count+1) || dfs(board,i-1,j,word,count+1) || dfs(board,i,j+1,word,count+1) || dfs(board,i,j-1,word,count+1);
+        bool ans=solve(i+1,j,board,word,vis,idx+1,n,m) ||
+                 solve(i-1,j,board,word,vis,idx+1,n,m) ||
+                 solve(i,j+1,board,word,vis,idx+1,n,m) ||
+                 solve(i,j-1,board,word,vis,idx+1,n,m);
 
-        board[i][j]=temp;
-        return isfound;
+        vis[i][j]=0;
+
+        return ans;
     }
+public:
     bool exist(vector<vector<char>>& board, string word) {
-        for(int i=0;i<board.size();i++) {
-            for(int j=0;j<board[0].size();j++) {
-                if(word[0]==board[i][j] && dfs(board,i,j,word,0)) return true;
+        int n=board.size();
+        int m=board[0].size();
+        vector<vector<int>> vis(n,vector<int>(m,0));
+        for(int i=0;i<n;i++) {
+            for(int j=0;j<m;j++) {
+                if(solve(i,j,board,word,vis,0,n,m)) {
+                    return true;
+                }
             }
         }
         return false;
